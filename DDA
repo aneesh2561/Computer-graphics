@@ -1,0 +1,90 @@
+#include <Gl/glut.h>
+#include <cmath>
+
+//write a setpixel function
+void setPixel(GLint x, GLint y)
+{
+	glBegin(GL_POINTS);
+	glVertex2i(x, y);
+	glEnd();
+}
+//write a function to draw a line using DDA
+void drawLine(GLint x1, GLint y1, GLint x2, GLint y2)
+{
+	GLint dx = x2 - x1;
+	GLint dy = y2 - y1;
+	GLfloat x = x1, y = y1;
+	GLfloat m = (float)dy / (float)dx;
+	GLfloat c = y - m * x;
+	if (abs(m) <= 1)
+	{
+		while (x <= x2)
+		{
+			setPixel(x, y);
+			x++;
+			y = m * x + c;
+		}
+	}
+	else
+	{
+		while (y <= y2)
+		{
+			setPixel(x, y);
+			y++;
+			x = (y - c) / m;
+		}
+	}
+}
+//write a function to draw a circle using DDA
+void drawCircle(GLint x1, GLint y1, GLint x2, GLint y2)
+{
+	GLint dx = x2 - x1;
+	GLint dy = y2 - y1;
+	GLfloat x = x1, y = y1;
+	GLfloat m = (float)dy / (float)dx;
+	GLfloat c = y - m * x;
+	GLfloat r = sqrt(dx * dx + dy * dy);
+	GLfloat x0 = x1, y0 = y1;
+	GLfloat x3 = x2, y3 = y2;
+	GLfloat x4 = x1, y4 = y2;
+	GLfloat x5 = x2, y5 = y1;
+	GLfloat x6 = x1 + (x2 - x1) / 2, y6 = y1;
+	GLfloat x7 = x1 + (x2 - x1) / 2, y7 = y2;
+	GLfloat x8 = x1, y8 = y1 + (y2 - y1) / 2;
+	GLfloat x9 = x2, y9 = y1 + (y2 - y1) / 2;
+	GLfloat x10 = x1 + (x2 - x1) / 2, y10 = y1 + (y2 - y1) / 2;
+	GLfloat x11 = x1 + (x2 - x1) / 4, y11 = y1 + (y2 - y1) / 4;
+	GLfloat x12 = x1 + (x2 - x1) / 4, y12 = y1 + 3 * (y2 - y1) / 4;
+	GLfloat x13 = x1 + 3 * (x2 - x1) / 4, y13 = y1 + (y2 - y1) / 4;
+	GLfloat x14 = x1 + 3 * (x2 - x1) / 4, y14 = y1 + 3 * (y2 - y1) / 4;
+	GLfloat x15 = x1 + (x2 - x1) / 4, y15 = y1 + (y2 - y1) / 2;
+	GLfloat x16 = x1 + 3 * (static_cast<GLfloat>(x2) - x1) / 4, y16 =
+}
+
+//write a displa function
+void display()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(1.0, 0.0, 0.0);
+	drawLine(100, 100, 200, 200);
+	drawLine(100, 200, 200, 100);
+	drawLine(100, 100, 100, 200);
+	drawLine(200, 100, 200, 200);
+	drawLine(100, 100, 200, 100);
+	drawLine(100, 200, 200, 200);
+	drawCircle(150, 150, 200, 150);
+	glFlush();
+}
+//write a main function
+void main(int argc, char** argv)
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitWindowPosition(50, 50);
+	glutInitWindowSize(400, 400);
+	glutCreateWindow("DDA Line");
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+	gluOrtho2D(0.0, 400.0, 0.0, 400.0);
+	glutDisplayFunc(display);
+	glutMainLoop();
+}
