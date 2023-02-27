@@ -1,0 +1,163 @@
+#include <Gl/glut.h>
+#include <cmath>
+
+//write a setpixel function
+void setPixel(GLint x, GLint y)
+{
+	glBegin(GL_POINTS);
+	glVertex2i(x, y);
+	glEnd();
+}
+
+
+//write a function to draw a circle using bresenham's algorithmand setpixel function
+void drawCircle(GLint x, GLint y, GLint r)
+{
+	GLint d = 3 - 2 * r;
+	GLint x1 = 0;
+	GLint y1 = r;
+	while (x1 <= y1)
+	{
+		setPixel(x + x1, y + y1);
+		setPixel(x + x1, y - y1);
+		setPixel(x - x1, y + y1);
+		setPixel(x - x1, y - y1);
+		setPixel(x + y1, y + x1);
+		setPixel(x + y1, y - x1);
+		setPixel(x - y1, y + x1);
+		setPixel(x - y1, y - x1);
+		if (d < 0)
+			d = d + 4 * x1 + 6;
+		else
+		{
+			d = d + 4 * (x1 - y1) + 10;
+			y1--;
+		}
+		x1++;
+	}
+}
+//write a function to draw a line using bresenham's algorithm and set pixel function
+void drawLine(GLint x1, GLint y1, GLint x2, GLint y2)
+{
+	GLint dx = abs(x2 - x1);
+	GLint dy = abs(y2 - y1);
+	GLint x = x1;
+	GLint y = y1;
+	GLint p = 2 * dy - dx;
+	GLint twoDy = 2 * dy;
+	GLint twoDyMinusDx = 2 * (dy - dx);
+	if (x1 > x2)
+	{
+		x = x2;
+		y = y2;
+		x2 = x1;
+	}
+	if (y1 < y2)
+	{
+		while (x < x2)
+		{
+			x++;
+			if (p < 0)
+				p += twoDy;
+			else
+			{
+				y++;
+				p += twoDyMinusDx;
+			}
+			setPixel(x, y);
+		}
+	}
+	else
+	{
+		while (x < x2)
+		{
+			x++;
+			if (p < 0)
+				p += twoDy;
+			else
+			{
+				y--;
+				p += twoDyMinusDx;
+			}
+			setPixel(x, y);
+		}
+	}
+}
+//write a function to draw an ellipse using bresenham's algorithm and setpixel function
+void drawEllipse(GLint x, GLint y, GLint rx, GLint ry)
+{
+	GLint rx2 = rx * rx;
+	GLint ry2 = ry * ry;
+	GLint twoRx2 = 2 * rx2;
+	GLint twoRy2 = 2 * ry2;
+	GLint p;
+	GLint x1 = 0;
+	GLint y1 = ry;
+	GLint px = 0;
+	GLint py = twoRx2 * y1;
+	//region 1
+	setPixel(x, y + ry);
+	setPixel(x, y - ry);
+	setPixel(x + rx, y);
+	setPixel(x - rx, y);
+	//region 2
+	p = round(ry2 - (rx2 * ry) + (0.25 * rx2));
+	while (px < py)
+	{
+		x1++;
+		px += twoRy2;
+		if (p < 0)
+			p += ry2 + px;
+		else
+		{
+			y1--;
+			py -= twoRx2;
+			p += ry2 + px - py;
+		}
+		setPixel(x + x1, y + y1);
+		setPixel(x - x1, y + y1);
+		setPixel(x + x1, y - y1);
+		setPixel(x - x1, y - y1);
+	}
+	//region 3
+	p = round(ry2 * (x1 + 0.5) * (x1 + 0.5) + rx2 * (y1 - 1) * (y1 - 1) - rx2 * ry2);
+	while (y1 > 0)
+	{
+		y1--;
+		py -= twoRx2;
+		if (p > 0)
+			p += rx2 - py;
+		else
+		{
+			x1++;
+			px += twoRy2;
+			p += rx2 - py + px;
+		}
+		setPixel(x + x1, y + y1);
+		setPixel(x - x1, y + y1);
+		setPixel(x + x1, y - y1);
+		setPixel(x - x1, y - y1);
+	}
+}
+//write a display function
+void display()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(1.0, 0.0, 0.0);
+	drawCircle(100, 100, 50);
+	drawLine(100, 100, 200, 200);
+	drawEllipse(100, 100, 50, 25);
+	glFlush();
+}
+//write a main function
+void main(int argc, char** argv)
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitWindowSize(500, 500);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("Bresenham's Algorithm");
+	gluOrtho2D(0, 500, 0, 500);
+	glutDisplayFunc(display);
+	glutMainLoop();
+}
