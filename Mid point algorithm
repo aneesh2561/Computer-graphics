@@ -1,0 +1,111 @@
+#include <Gl/glut.h>
+#include <cmath>
+
+//write a setpixel function
+void setPixel(GLint x, GLint y)
+{
+	glBegin(GL_POINTS);
+	glVertex2i(x, y);
+	glEnd();
+}
+
+//write a function to draw a circle using mid point algorithm and setpixel function
+void drawCircle(GLint x, GLint y, GLint r)
+{
+	GLint d = 1 - r;
+	GLint x1 = 0;
+	GLint y1 = r;
+	while (x1 <= y1)
+	{
+		setPixel(x + x1, y + y1);
+		setPixel(x + x1, y - y1);
+		setPixel(x - x1, y + y1);
+		setPixel(x - x1, y - y1);
+		setPixel(x + y1, y + x1);
+		setPixel(x + y1, y - x1);
+		setPixel(x - y1, y + x1);
+		setPixel(x - y1, y - x1);
+		if (d < 0)
+		{
+			d += 2 * x1 + 3;
+		}
+		else
+		{
+			d += 2 * (x1 - y1) + 5;
+			y1--;
+		}
+		x1++;
+	}
+}
+
+//write a function to draw a ellipse using mid point algorithm and setpixel function
+void drawEllipse(GLint x, GLint y, GLint rx, GLint ry)
+{
+	GLint d1, d2, x1, y1;
+	x1 = 0;
+	y1 = ry;
+	d1 = (ry * ry) - (rx * rx * ry) + (0.25 * rx * rx);
+	setPixel(x + x1, y + y1);
+	setPixel(x - x1, y + y1);
+	setPixel(x + x1, y - y1);
+	setPixel(x - x1, y - y1);
+	while ((ry * ry * x1) < (rx * rx * y1))
+	{
+		if (d1 < 0)
+		{
+			d1 = d1 + (2 * ry * ry * x1) + (ry * ry);
+			x1++;
+		}
+		else
+		{
+			d1 = d1 + (2 * ry * ry * x1) - (2 * rx * rx * y1) + (ry * ry);
+			x1++;
+			y1--;
+		}
+		setPixel(x + x1, y + y1);
+		setPixel(x - x1, y + y1);
+		setPixel(x + x1, y - y1);
+		setPixel(x - x1, y - y1);
+	}
+	d2 = ((ry * ry) * ((x1 + 0.5) * (x1 + 0.5))) + ((rx * rx) * ((y1 - 1) * (y1 - 1))) - (rx * rx * ry * ry);
+	while (y1 >= 0)
+	{
+		if (d2 > 0)
+		{
+			d2 = d2 - (2 * rx * rx * y1) + (rx * rx);
+			y1--;
+		}
+		else
+		{
+			d2 = d2 + (2 * ry * ry * x1) - (2 * rx * rx * y1) + (rx * rx);
+			x1++;
+			y1--;
+		}
+		setPixel(x + x1, y + y1);
+		setPixel(x - x1, y + y1);
+		setPixel(x + x1, y - y1);
+		setPixel(x - x1, y - y1);
+	}
+}
+//write a display function
+void display()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(1.0, 0.0, 0.0);
+	drawCircle(100, 100, 50);
+	glColor3f(0.0, 1.0, 0.0);
+	drawEllipse(300, 100, 50, 25);
+	glFlush();
+}
+//write a main function
+void main(int argc, char** argv)
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitWindowSize(500, 500);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("Circle and Ellipse");
+	gluOrtho2D(0, 500, 0, 500);
+	glutDisplayFunc(display);
+	glutMainLoop();
+}
